@@ -133,8 +133,48 @@ class HyperparameterTuner:
         self.best_k = None
         self.best_distance_function = None
         self.best_model = None
-        raise NotImplementedError
 
+        f1_score_max = -float("inf")
+
+        for distance in distance_funcs.items():
+            for k in range(1, 31, 2):
+                knn = knn.KNN(k, distance_funcs[distance])
+                knn.train(x_train, y_train)
+                predicted_vals = knn.predict(x_val)
+                f1_score_val = f1_score(y_val, predicted_vals)
+                if f1_score_val > f1_score_max:
+                    f1_score_max = f1_score_val
+                    self.best_k = k
+                    self.best_distance_function = distance
+                    self.best_model = knn
+                elif f1_score == f1_score_max:
+                    if distance == self.best_distance_function:
+                        if k < self.k:
+                            self.k = k
+                            self.best_distance_function = distance
+                            self.best_model = knn
+                    else:
+                        if distance == 'euclidean':
+                            self.best_distance_function = distance
+                            self.best_k = k
+                            self.best_model = knn
+                        elif distance == 'minkowski':
+                            if self.best_distance_function == 'gaussian' or self.best_distance_function == 'inner_prod' or self.best_distance_function == 'cosine_dist':
+                                self.best_distance_function = distance
+                                self.best_k = k
+                                self.best_model = knn
+                        elif distance == 'gaussian':
+                            if self.best_distance_function == 'inner_prod' or self.best_distance_function == 'cosine_dist':
+                                self.best_distance_function = distance
+                                self.best_k = k
+                                self.best_model = knn
+                        elif distance == 'inner_prod':
+                            if self.best_distance_function == 'cosine_dist':
+                                self.best_distance_function = distance
+                                self.best_k = k
+                                self.best_model = knn
+                
+        raise NotImplementedError
     # TODO: find parameters with the best f1 score on validation dataset, with normalized data
     def tuning_with_scaling(self, distance_funcs, scaling_classes, x_train, y_train, x_val, y_val):
         """
@@ -239,24 +279,3 @@ class MinMaxScaler:
         """
         raise NotImplementedError
 
-def main():
-    """
-    y_true = [0, 1, 1, 0, 1, 0]
-    y_pred = [0, 0, 1, 0, 0, 1]
-    f1_score_val = f1_score(y_true, y_pred)
-    print(f1_score_val)
-    """
-    
-    a = [0, 3, 4, 5]
-    b = [7, 6, 3, -1]
-    result = Distances.gaussian_kernel_distance(a, b)
-    print(result)
-    
-    
-
-    
-
-    
-
-if __name__=="__main__":
-    main()

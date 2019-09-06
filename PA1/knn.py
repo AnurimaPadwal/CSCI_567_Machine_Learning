@@ -1,4 +1,5 @@
 import numpy as np
+from utils import Distances
 from collections import Counter
 
 
@@ -10,6 +11,8 @@ class KNN:
         """
         self.k = k
         self.distance_function = distance_function
+        self.features = None
+        self.labels = None
 
     # TODO: save features and lable to self
     def train(self, features, labels):
@@ -24,6 +27,8 @@ class KNN:
         :param features: List[List[float]]
         :param labels: List[int]
         """
+        self.features = features
+        self.labels = labels
         raise NotImplementedError
 
     # TODO: predict labels of a list of points
@@ -37,6 +42,14 @@ class KNN:
         :param features: List[List[float]]
         :return: List[int]
         """
+        result = []
+        for feature in features:
+            neighbors = self.get_k_neighbors(feature)
+            count_frequency =  collections.Counter(neighbors)
+            frequent = count_frequency.most_common(1)
+            result.append(frequent[0][0])
+        return result
+
         raise NotImplementedError
 
     # TODO: find KNN of one point
@@ -48,6 +61,21 @@ class KNN:
         :param point: List[float]
         :return:  List[int]
         """
+        distances = {}
+        result = []
+        for i in range(len(self.features)):
+            distance = utils.Distances.self.distance_function(point, self.features[i])
+            distances[self.labels[i]] = distance
+        
+        distances = sorted(distances.iteritems(), key = lambda x: x[1], reverse = True)
+
+        for i in range(self.k):
+            result.append(distances[i][1])
+        
+        return result
+
+
+
         raise NotImplementedError
 
 
