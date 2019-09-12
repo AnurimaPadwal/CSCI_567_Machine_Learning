@@ -78,11 +78,18 @@ class Distances:
        :param point2: List[float]
        :return: float
        """
+<<<<<<< HEAD
         
         result = (np.dot(point1, point2))/(np.linalg.norm(point1) * np.linalg.norm(point2))
         return (1 - result)
         
         #raise NotImplementedError
+=======
+        result = (np.dot(point1, point2))/(np.linalg.norm(point1) * np.linalg.norm(point2))
+        return (1 - result)
+        
+        raise NotImplementedError
+>>>>>>> origin/master
 
     @staticmethod
     # TODO
@@ -95,8 +102,12 @@ class Distances:
         x = np.asarray(point1) - np.asarray(point2)
         x = -0.5 * np.dot(x, x)
         return -np.exp(x)
+<<<<<<< HEAD
         
         #raise NotImplementedError
+=======
+        raise NotImplementedError
+>>>>>>> origin/master
 
 
 class HyperparameterTuner:
@@ -132,6 +143,7 @@ class HyperparameterTuner:
         """
         
         # You need to assign the final values to these variables
+<<<<<<< HEAD
       
 
         f1_score_max = -float("inf")
@@ -143,40 +155,79 @@ class HyperparameterTuner:
                 knn_model = KNN(k, distance_funcs[distance])
                 knn_model.train(x_train, y_train)
                 predicted_vals = knn_model.predict(x_val)
+=======
+        self.best_k = None
+        self.best_distance_function = None
+        self.best_model = None
+
+        f1_score_max = -float("inf")
+
+        for distance in distance_funcs.items():
+            for k in range(1, 31, 2):
+                knn = knn.KNN(k, distance_funcs[distance])
+                knn.train(x_train, y_train)
+                predicted_vals = knn.predict(x_val)
+>>>>>>> origin/master
                 f1_score_val = f1_score(y_val, predicted_vals)
                 if f1_score_val > f1_score_max:
                     f1_score_max = f1_score_val
                     self.best_k = k
                     self.best_distance_function = distance
+<<<<<<< HEAD
                     self.best_model = knn_model
+=======
+                    self.best_model = knn
+>>>>>>> origin/master
                 elif f1_score == f1_score_max:
                     if distance == self.best_distance_function:
                         if k < self.k:
                             self.k = k
                             self.best_distance_function = distance
+<<<<<<< HEAD
                             self.best_model = knn_model
+=======
+                            self.best_model = knn
+>>>>>>> origin/master
                     else:
                         if distance == 'euclidean':
                             self.best_distance_function = distance
                             self.best_k = k
+<<<<<<< HEAD
                             self.best_model = knn_model
+=======
+                            self.best_model = knn
+>>>>>>> origin/master
                         elif distance == 'minkowski':
                             if self.best_distance_function == 'gaussian' or self.best_distance_function == 'inner_prod' or self.best_distance_function == 'cosine_dist':
                                 self.best_distance_function = distance
                                 self.best_k = k
+<<<<<<< HEAD
                                 self.best_model = knn_model
+=======
+                                self.best_model = knn
+>>>>>>> origin/master
                         elif distance == 'gaussian':
                             if self.best_distance_function == 'inner_prod' or self.best_distance_function == 'cosine_dist':
                                 self.best_distance_function = distance
                                 self.best_k = k
+<<<<<<< HEAD
                                 self.best_model = knn_model
+=======
+                                self.best_model = knn
+>>>>>>> origin/master
                         elif distance == 'inner_prod':
                             if self.best_distance_function == 'cosine_dist':
                                 self.best_distance_function = distance
                                 self.best_k = k
+<<<<<<< HEAD
                                 self.best_model = knn_model
                 
         #raise NotImplementedError
+=======
+                                self.best_model = knn
+                
+        raise NotImplementedError
+>>>>>>> origin/master
     # TODO: find parameters with the best f1 score on validation dataset, with normalized data
     def tuning_with_scaling(self, distance_funcs, scaling_classes, x_train, y_train, x_val, y_val):
         """
@@ -207,6 +258,7 @@ class HyperparameterTuner:
         """
         
         # You need to assign the final values to these variables
+<<<<<<< HEAD
      
     
 
@@ -279,6 +331,13 @@ class HyperparameterTuner:
 
 
         #raise NotImplementedError
+=======
+        self.best_k = None
+        self.best_distance_function = None
+        self.best_scaler = None
+        self.best_model = None
+        raise NotImplementedError
+>>>>>>> origin/master
 
 
 class NormalizationScaler:
@@ -297,6 +356,7 @@ class NormalizationScaler:
         :param features: List[List[float]]
         :return: List[List[float]]
         """
+<<<<<<< HEAD
         normalized_features = []
         for feature in features:
             if not np.any(feature):
@@ -307,6 +367,9 @@ class NormalizationScaler:
 
         return normalized_features   
         #raise NotImplementedError
+=======
+        raise NotImplementedError
+>>>>>>> origin/master
 
 
 class MinMaxScaler:
@@ -344,10 +407,13 @@ class MinMaxScaler:
     """
 
     def __init__(self):
+<<<<<<< HEAD
         self.is_called = False
         self.features_max = None
         self.features_min = None
         self.max_min_difference = None
+=======
+>>>>>>> origin/master
         pass
 
     def __call__(self, features):
@@ -359,6 +425,7 @@ class MinMaxScaler:
         :param features: List[List[float]]
         :return: List[List[float]]
         """
+<<<<<<< HEAD
         if not self.is_called:
             self.is_called = True
             self.features_max = np.amax(features, axis=0)
@@ -373,4 +440,7 @@ class MinMaxScaler:
         return result.tolist()
         
         #raise NotImplementedError
+=======
+        raise NotImplementedError
+>>>>>>> origin/master
 
