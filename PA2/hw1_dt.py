@@ -1,7 +1,6 @@
 import numpy as np
 import utils as Util
 
-
 class DecisionTree():
     def __init__(self):
         self.clf_name = "DecisionTree"
@@ -15,6 +14,7 @@ class DecisionTree():
 
         # build the tree
         self.root_node = TreeNode(features, labels, num_cls)
+        
         if self.root_node.splittable:
             self.root_node.split()
 
@@ -39,6 +39,7 @@ class TreeNode(object):
         self.num_cls = num_cls
         self.value = None
         self.split_index = None
+        self.accuracy = None
         # find the most common labels in current node
         count_max = 0
         for label in np.unique(labels):
@@ -56,8 +57,7 @@ class TreeNode(object):
         self.feature_uniq_split = None  # the possible unique values of the feature to be split
 
     #TODO: try to split current node
-    def split(self):
-    
+    def split(self): 
         node_entropy = 0
         
         for label in set(self.labels):
@@ -104,33 +104,27 @@ class TreeNode(object):
         
         self.dim_split = max_gain_branch_id
        
-        for i in range(len(self.features)):
-            self.features[i].append(self.labels[i])
         
-        splits =  []
-        
-        x  = np.asarray(self.features)
+        x  = np.array(self.features)
         values = np.unique(x[:,max_gain_branch_id])
         values = sorted(values)
         self.feature_uniq_split = values
-        for value in values:
-            condition = x[:,max_gain_branch_id] == value
-            splits.append(x[condition])
+        
         
         
         #self.features = np.delete(self.features, len(self.features)-1, axis = 1)
-       
+        x_i = np.array(self.features)[:, self.dim_split]
         
-        
-        for split_item in splits:
-            child_labels = split_item[:,-1]
-            child_features = split_item[:,:-1]
+        for val in self.feature_uniq_split:
+            indexes = np.where(x_i == val)
+            child_features = x[indexes].tolist()
             child_features = np.delete(child_features, self.dim_split,axis=1)
-            child_features  = child_features.tolist()
-            child_labels = list(map(int, child_labels.tolist()))
+            child_labels = np.array(self.labels)[indexes].tolist()   
             num_cls = np.unique(child_labels).size
             node = TreeNode(child_features, child_labels, num_cls)
-            
+            if np.array(child_features).size == 0 or all(x is None for x in child_features[0]):
+                node.splittable = False
+ 
             self.children.append(node)
         
         #self.children = sorted(self.children, key = lambda x : x.value)
@@ -156,17 +150,3 @@ class TreeNode(object):
             return self.children[idx].predict(np.delete(feature, self.dim_split))
         else:
             return self.cls_max
-            
-
-
-
-        
-        
-
-
-
-
-
-        
-
-

@@ -20,6 +20,7 @@ def sample_decision_tree_test():
 
 
 def sample_decision_tree_pruning():
+    
     features = [[0, 0, 0, 0],
                 [0, 0, 0, 1],
                 [1, 0, 0, 0],
@@ -48,6 +49,7 @@ def sample_decision_tree_pruning():
                   [2, 1, 0, 1],
                   [2, 1, 0, 0]]
     v_labels = [1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+  
     return features, labels, validation, v_labels
 
 

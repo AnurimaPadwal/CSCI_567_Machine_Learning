@@ -75,4 +75,4 @@ def pruning_decision_tree_test():
 if __name__ == "__main__":
     information_gain_test()
     decision_tree_test()
-    #pruning_decision_tree_test()
+    pruning_decision_tree_test()
