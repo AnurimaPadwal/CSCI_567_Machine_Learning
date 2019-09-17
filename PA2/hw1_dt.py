@@ -103,6 +103,10 @@ class TreeNode(object):
                     max_gain_branch_id = i
         
         self.dim_split = max_gain_branch_id
+        
+        if max_gain_branch_id == -1:
+            self.splittable = False
+            return
        
         
         x  = np.array(self.features)
@@ -124,7 +128,7 @@ class TreeNode(object):
             node = TreeNode(child_features, child_labels, num_cls)
             if np.array(child_features).size == 0 or all(x is None for x in child_features[0]):
                 node.splittable = False
- 
+              
             self.children.append(node)
         
         #self.children = sorted(self.children, key = lambda x : x.value)

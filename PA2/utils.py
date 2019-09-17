@@ -34,11 +34,10 @@ def reduced_error_prunning(decisionTree, X_test, y_test):
     # y_test: List
     #raise NotImplementedError
     
-    if len(X_test) == 0 or len(X_test[0]) == 0:
-        label = decisionTree.root_node.cls_max
-        return [label] * len(y_test)
+    
     
     queue = []
+    
     queue.append(decisionTree.root_node)
     y_true = decisionTree.predict(X_test)
     
@@ -62,6 +61,7 @@ def reduced_error_prunning(decisionTree, X_test, y_test):
         node.splittable = True
         
         accuracy = calculate_accuracy(y_test, predicted_vals)
+        
         node.accuracy = accuracy
         if accuracy >= max_accuracy:
             return True
@@ -70,11 +70,8 @@ def reduced_error_prunning(decisionTree, X_test, y_test):
 
     while queue:
         root = queue.pop()
-        if root is decisionTree.root_node:
-            queue.extend(root.children)
-            continue
-            
-        if root.splittable and can_prune(root):
+        
+        if root is not decisionTree.root_node and root.splittable and can_prune(root):
             root.splittable = False
             root.children = None
             max_accuracy = root.accuracy
@@ -82,10 +79,77 @@ def reduced_error_prunning(decisionTree, X_test, y_test):
         else:
             queue.extend(root.children)
     
+    if decisionTree.root_node.splittable:
+        decisionTree.root_node.splittable = False
+        predicted_vals = decisionTree.predict(X_test)
+        
+        
+        accuracy = calculate_accuracy(y_test, predicted_vals)
+        if accuracy >= max_accuracy:
+            decisionTree.root_node.children = False
+        else:
+            decisionTree.root_node.splittable = True
+        
 
     return decisionTree.predict(X_test)  
+   
+    """
+    if X_test is None or len(X_test) == 0 or len(X_test[0]) == 0:
+        decisionTree.root_node.children = None
+        decisionTree.root_node.splittable = False
+        return decisionTree.predict(X_test)
+    
+    def calculate_accuracy(y_true, y_predicted):
+        count = 0
+        for i in range(len(y_true)):
+            if y_true[i] == y_predicted[i]:
+                count += 1
+        
+        accuracy = float(count)/len(y_true)
+
+        return accuracy
+    
+    def prune(node, max_accuracy):
+        if not node.splittable:
+            return max_accuracy
+        
+        for child in node.children:
+            max_accuracy = prune(child, max_accuracy)
+            node.splittable = False
+            y_predicted = decisionTree.predict(X_test)
+            accuracy = calculate_accuracy(y_test, y_predicted)
+            if accuracy >= max_accuracy:
+                max_accuracy = accuracy
+                node.splittable = False
+                node.children = None
+                return max_accuracy
+            else:
+                node.splittable = True
+        
+            
+        return max_accuracy
+
+    y_labels = decisionTree.predict(X_test)
+    max_accuracy = calculate_accuracy(y_test, y_labels)
+    root = decisionTree.root_node
+    
+    
+    max_accuracy = prune(root, max_accuracy)
+    if root.splittable:
+        root.splittable = False
+        y_predicted = decisionTree.predict(X_test)
+        accuracy = calculate_accuracy(y_test, y_predicted)
+        if accuracy >= max_accuracy:
+            root.children = None
+        else:
+            root.splittable = True
+        
+    return decisionTree.predict(X_test)
+    """
     
 
+    
+        
 
 # print current tree
 def print_tree(decisionTree, node=None, name='branch 0', indent='', deep=0):
