@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def binary_train(X, y, loss="perceptron", w0=None, b0=None, step_size=0.5, max_iterations=1000):
     """
     Inputs:
@@ -34,11 +33,42 @@ def binary_train(X, y, loss="perceptron", w0=None, b0=None, step_size=0.5, max_i
         ############################################
         # TODO 1 : Edit this if part               #
         #          Compute w and b here            #
-        w = np.zeros(D)
-        b = 0
+        #w = np.zeros(D)
+        #b = 0
         ############################################
+        for t in range(max_iterations):
+            
+            z = np.dot(X,w) + b
+            y_new = y
+            y_new[y_new == 0] = -1
+            
+            s = y_new * z
         
-
+            
+            sign = np.zeros(N)
+            sign = (s <=0).astype(float)
+            
+            prod = sign * y_new
+            w_grad = np.dot(prod, X)
+            b_grad = np.sum(prod)
+            
+            w = w + step_size * w_grad/N
+            b = b + step_size * b_grad/N
+           
+        
+            """
+            ypred = np.matmul(X,w) + b
+            ypred[ypred > 0] = 1
+            ypred[ypred <= 0] = 0
+            sign = y - ypred
+            w_grad = np.matmul(sign,X)/N
+            b_grad = np.sum(sign)/N
+      
+            w = w + step_size * w_grad
+            b = b + step_size * b_grad
+            """
+            
+  
     elif loss == "logistic":
         ############################################
         # TODO 2 : Edit this if part               #
@@ -46,7 +76,17 @@ def binary_train(X, y, loss="perceptron", w0=None, b0=None, step_size=0.5, max_i
         w = np.zeros(D)
         b = 0
         ############################################
-        
+        for t in range(max_iterations):
+            z = sigmoid(np.dot(X,w) + b)
+            diff = z - y
+            w_grad = diff.dot(X)/N
+            b_grad = np.sum(diff)/N
+            
+            w = w - step_size * w_grad
+            b = b - step_size * b_grad
+            
+            
+            
 
     else:
         raise "Loss Function is undefined."
@@ -67,9 +107,10 @@ def sigmoid(z):
     ############################################
     # TODO 3 : Edit this part to               #
     #          Compute value                   #
-    value = z
     ############################################
     
+    value = 1.0/(1 + np.exp(-z))
+
     return value
 
 def binary_predict(X, w, b, loss="perceptron"):
@@ -93,6 +134,9 @@ def binary_predict(X, w, b, loss="perceptron"):
         #          Compute preds                   #
         preds = np.zeros(N)
         ############################################
+        prediction = np.dot(X,w) + b
+        preds = (prediction > 0).astype(float)
+   
         
 
     elif loss == "logistic":
@@ -101,7 +145,8 @@ def binary_predict(X, w, b, loss="perceptron"):
         #          Compute preds                   #
         preds = np.zeros(N)
         ############################################
-        
+        prediction = sigmoid(np.dot(X,w) + b)
+        preds = (prediction > 0.5).astype(float)
 
     else:
         raise "Loss Function is undefined."
@@ -145,24 +190,66 @@ def multiclass_train(X, y, C,
     b = np.zeros(C)
     if b0 is not None:
         b = b0
-
+    
+   
+    
     np.random.seed(42)
     if gd_type == "sgd":
         ############################################
         # TODO 6 : Edit this if part               #
         #          Compute w and b                 #
-        w = np.zeros((C, D))
-        b = np.zeros(C)
+        #w = np.zeros((C, D))
+        #b = np.zeros(C)
         ############################################
+        y = np.eye(C)[y]
         
-
+        def softmax(z):
+            z = np.exp(z - np.amax(z))
+            denominator = np.sum(z)
+            return (z.T/denominator).T
+        for t in range(max_iterations):
+            #idx = np.random.randint(X.shape[0], size = 1)
+            idx = np.random.choice(N)
+            
+            x = X[idx,:]
+            y_new = y[idx,:]
+            
+            error = softmax((np.dot(w,x.T) + b)) - y_new
+            
+            error = error.reshape((C,1))
+            x = x.reshape((1,D))
+            
+            w_gradient = np.dot(error, x)/N
+            b_gradient = np.sum(error,axis = 0)/N
+            
+            w = w - step_size * w_gradient
+            b = b - step_size * b_gradient
+            
+            
+            
     elif gd_type == "gd":
         ############################################
         # TODO 7 : Edit this if part               #
         #          Compute w and b                 #
-        w = np.zeros((C, D))
-        b = np.zeros(C)
+        #w = np.zeros((C, D))
+        #b = np.zeros(C)
         ############################################
+        
+        y = np.eye(C)[y]
+        
+        def softmax(z):
+            z = np.exp(z - np.amax(z))
+            denominator = np.sum(z,axis=1)
+            return (z.T/denominator).T
+       
+        
+        for t in range(max_iterations):
+            error = softmax(np.dot(X,w.T) + b) - y
+            w_gradient = np.dot(error.T, X)/N
+            b_gradient = np.sum(error,axis=0)/N
+            
+            w = w - step_size * w_gradient
+            b = b - step_size * b_gradient
         
 
     else:
@@ -194,11 +281,16 @@ def multiclass_predict(X, w, b):
     #          Compute preds                   #
     preds = np.zeros(N)
     ############################################
-
+    
+    def softmax(z):
+        numerator = np.exp(z - np.max(z))
+        denominator = np.sum(numerator, axis=1)
+       
+        return (numerator.T/denominator).T
+    
+    
+    preds = softmax(np.dot(X, w.T) + b)
+    preds = np.argmax(preds, axis = 1)
+    
     assert preds.shape == (N,)
     return preds
-
-
-
-
-        
