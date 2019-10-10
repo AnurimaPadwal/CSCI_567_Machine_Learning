@@ -55,19 +55,7 @@ def binary_train(X, y, loss="perceptron", w0=None, b0=None, step_size=0.5, max_i
             w = w + step_size * w_grad/N
             b = b + step_size * b_grad/N
            
-        
-            """
-            ypred = np.matmul(X,w) + b
-            ypred[ypred > 0] = 1
-            ypred[ypred <= 0] = 0
-            sign = y - ypred
-            w_grad = np.matmul(sign,X)/N
-            b_grad = np.sum(sign)/N
-      
-            w = w + step_size * w_grad
-            b = b + step_size * b_grad
-            """
-            
+          
   
     elif loss == "logistic":
         ############################################
@@ -206,21 +194,21 @@ def multiclass_train(X, y, C,
         def softmax(z):
             z = np.exp(z - np.amax(z))
             denominator = np.sum(z)
-            return (z.T/denominator).T
+            return (z/denominator)
+        
+       
         for t in range(max_iterations):
-            #idx = np.random.randint(X.shape[0], size = 1)
             idx = np.random.choice(N)
             
-            x = X[idx,:]
-            y_new = y[idx,:]
+            x = X[idx]
+            y_new = y[idx]
             
-            error = softmax((np.dot(w,x.T) + b)) - y_new
             
-            error = error.reshape((C,1))
-            x = x.reshape((1,D))
+            error = softmax(np.dot(x,w.T) + b) - y_new
+           
             
-            w_gradient = np.dot(error, x)/N
-            b_gradient = np.sum(error,axis = 0)/N
+            w_gradient = np.outer(error,x)
+            b_gradient = error
             
             w = w - step_size * w_gradient
             b = b - step_size * b_gradient
@@ -244,6 +232,7 @@ def multiclass_train(X, y, C,
        
         
         for t in range(max_iterations):
+            
             error = softmax(np.dot(X,w.T) + b) - y
             w_gradient = np.dot(error.T, X)/N
             b_gradient = np.sum(error,axis=0)/N
