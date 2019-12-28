@@ -106,6 +106,6 @@ def speech_tagging_test():
 
 if __name__ == "__main__":
 
-    #hmm_test()
+    hmm_test()
 
     speech_tagging_test()
